@@ -1,0 +1,8 @@
+
+This module requrie ndisasm tool and gdb
+
+
+echo ne "SHELLCODE" | ndisasm -u -
+
+use also gdb to understand better what the shellcode does if using ndiasm is being too difficult
+
