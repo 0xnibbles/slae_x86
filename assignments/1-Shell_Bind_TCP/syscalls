@@ -1,0 +1,8 @@
+
+socket - 359 - 0x167
+bind - 361 - 0x169
+listen - 363 - 0x16b
+accept4 - 364 - 0x16c
+dup2 - 63 - 0x3f
+execve - 11 - 0xb
+
