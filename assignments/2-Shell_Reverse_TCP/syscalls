@@ -1,0 +1,4 @@
+socket -> 359 - 0x167
+connect -> 362 - 0x16A
+dup2 -> 63 - 0x3F
+execve -> 11 - 0xb
