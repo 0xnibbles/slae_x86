@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 
-# Shellcode XOR, NOT byte Encoder
-
-# TODO
+# The FlipRoter Shellcode decoder
 #
-#1- option to generate new key with the same instanced object using a random key;
-#2- bad xor key byte - generate a key byte that is not present in the shellcode. this will result in a null byte and be the marker to stop the converting operation; 
+# Rotates back and flips the lowest bit of each byte.
+#
 
 import argparse
 import secrets
@@ -99,11 +97,7 @@ class Encoder:
         for shellbyte in shellcode:
             
             flipped_shellbyte = shellbyte ^ 0x01    # flip lowest bit
-            '''
-            print(flipped_shellbyte)
-            print(type(format(flipped_shellbyte,'08b')))
-            print(format(flipped_shellbyte,'08b')) # 8 digits binary padded with zeros
-            '''
+            
             if bin(flipped_shellbyte)[-1] == '0':
                 logging.info("Flipped byte - odd - "+str(flipped_shellbyte))
                 rotated_shellbyte = self.rightRotate(format(flipped_shellbyte,'08b'),rotation_counter% 8 ) # 8 because we are rotating with 8 bits
@@ -116,31 +110,6 @@ class Encoder:
             
             final_shellbyte =  bin2hex(rotated_shellbyte)
             
-            '''
-            print("Shellbyte: "+ format(shellbyte,'08b'))
-            print(bin2hex(format(shellbyte,'08b')))         
-            print("Flipped byte - "+format(flipped_shellbyte,'08b'))
-            print(bin2hex(format(flipped_shellbyte,'08b')))
-            
-            print("Rotated Shellbyte - "+rotated_shellbyte)
-            print(bin2hex(rotated_shellbyte))
-            print("-----------------------------")
-
-            if bin2hex(format(shellbyte,'08b')) == '0x62':
-                print("rotation counter: "+ str(rotation_counter))
-                print(rotation_counter%(len(shellcode)//2))
-                
-                sys.exit(0)
-            '''
-            '''
-            print("len shellcode: "+str(len(shellcode)//2))
-            print("Flipped byte - "+format(flipped_shellbyte,'08b'))
-            print("Rotated Shellbyte - "+rotated_shellbyte)
-            print(rotation_counter)
-            print("--------------------")
-            print("Final hex byte - "+ final_shellbyte)
-            print("--------------------")
-            '''
             rotation_counter += 1
 
             encoded += final_shellbyte + ',' + rotation_direction +','  # \x format
