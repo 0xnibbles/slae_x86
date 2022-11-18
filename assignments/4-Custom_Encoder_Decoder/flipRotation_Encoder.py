@@ -18,7 +18,7 @@ import sys
 #args = parser.parse_args()
 
 #logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 
 secretsGenerator = secrets.SystemRandom()
 
@@ -32,9 +32,9 @@ def banner():
 
     print('''
         
-        _______________________________________________________
-         <The "XORCoder" - XOR your shellcode (encode/decode)>
-        -------------------------------------------------------
+        _______________________________________________________________
+         <The "FlipRoter" Encoder - Bit flip and rotate your shellcode
+        ---------------------------------------------------------------
             \   ^__^
             \   (oo)\_______
                 (__)\       )\/\\
@@ -45,6 +45,9 @@ def banner():
 
 #----------------------------
 
+
+def bin2hex(binstr):
+    return hex(int(binstr,2))
 
 class Encoder:
 
@@ -66,7 +69,7 @@ class Encoder:
             
             if key is not None:
                 self.key = key
-                print("[*] Key Provided. Doing magic with it")
+                print("[*] Key Provided by the user. Doing magic with it")
             else:
                 self.key = self.randomKeyGenerator()
                 print("[*] Doing magic with a (pseudo) Random key")
@@ -90,39 +93,67 @@ class Encoder:
 
         encoded = '' # 0x format
         encoded2 = '' # \x format
+        rotation_direction = ''
+        
         rotation_counter = 0
         for shellbyte in shellcode:
-            '''
-            logging.info("Shellbyte type - "+str(shellbyte))
-            encoded += hex(shellbyte) + ',' + hex(self.key)  + ','
-            '''
-
-            #encoded2 += '\\x' + hex(shellbyte)[2:] + '\\x' + hex(self.key)[2:] # \x format
             
             flipped_shellbyte = shellbyte ^ 0x01    # flip lowest bit
-            
+            '''
             print(flipped_shellbyte)
-            print(type(bin(flipped_shellbyte)))
-            print(bin(flipped_shellbyte))
-            print(bin(flipped_shellbyte)[2:])
-
+            print(type(format(flipped_shellbyte,'08b')))
+            print(format(flipped_shellbyte,'08b')) # 8 digits binary padded with zeros
+            '''
             if bin(flipped_shellbyte)[-1] == '0':
                 logging.info("Flipped byte - odd - "+str(flipped_shellbyte))
-                rotated_shellbyte = self.rightRotate(bin(flipped_shellbyte)[2:],rotation_counter)
+                rotated_shellbyte = self.rightRotate(format(flipped_shellbyte,'08b'),rotation_counter% 8 ) # 8 because we are rotating with 8 bits
+                rotation_direction = '0x02' 
             else:
                 logging.info("Flipped byte - even - "+str(flipped_shellbyte))
-                rotated_shellbyte = self.leftRotate(bin(flipped_shellbyte)[2:],rotation_counter)
+                rotated_shellbyte = self.leftRotate(format(flipped_shellbyte,'08b'),rotation_counter% 8 )  # 8 because we are rotating with 8 bits
+                print("After rotation: "+ bin2hex(self.leftRotate(format(flipped_shellbyte,'08b'),rotation_counter%8)))
+                rotation_direction = '0xff'
+            
+            final_shellbyte =  bin2hex(rotated_shellbyte)
+            
+            '''
+            print("Shellbyte: "+ format(shellbyte,'08b'))
+            print(bin2hex(format(shellbyte,'08b')))         
+            print("Flipped byte - "+format(flipped_shellbyte,'08b'))
+            print(bin2hex(format(flipped_shellbyte,'08b')))
+            
+            print("Rotated Shellbyte - "+rotated_shellbyte)
+            print(bin2hex(rotated_shellbyte))
+            print("-----------------------------")
 
-            print("Rotated SHellbyte - "+rotated_shellbyte)
-            print(rotated_shellbyte)
+            if bin2hex(format(shellbyte,'08b')) == '0x62':
+                print("rotation counter: "+ str(rotation_counter))
+                print(rotation_counter%(len(shellcode)//2))
+                
+                sys.exit(0)
+            '''
+            '''
+            print("len shellcode: "+str(len(shellcode)//2))
+            print("Flipped byte - "+format(flipped_shellbyte,'08b'))
+            print("Rotated Shellbyte - "+rotated_shellbyte)
+            print(rotation_counter)
             print("--------------------")
+            print("Final hex byte - "+ final_shellbyte)
+            print("--------------------")
+            '''
             rotation_counter += 1
 
+            encoded += final_shellbyte + ',' + rotation_direction +','  # \x format
+
+            encoded2 += '\\x' + final_shellbyte[2:] + '\\x' + rotation_direction[2:] # \x format
+
         print("\n[*] \\x format: ")
+        encoded2 += '\\x' + hex(self.key)[2:]   # add marker
         print(encoded2)
             
         print("\n[*] 0x format: ")
-        print(encoded[:-1])
+        encoded += '0x' + hex(self.key)[2:] + ',' + '0x' + hex(self.key)[2:] #add marker
+        print(encoded)
 
 
 
@@ -133,7 +164,7 @@ def main():
     print("[*] Shellcode: "+str(c_style_shellcode)+"\n")
 
     # -------------------KEY-------------- 
-    key = 0xff
+    key = 0xa0  # can't be 0x02 or 0xff. used for rotation direction
     #key = None
     #####################################
 
