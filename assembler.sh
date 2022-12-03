@@ -21,8 +21,15 @@ echo "[*] Extracting opcodes"
 echo "[*] Done"
 
 echo
-objdump -d ${filename} |grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-7 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'
+opcodes=$(objdump -d ${filename} |grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-7 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g')
 
+size=$(echo -ne $opcodes | tr -d '"' | wc -c)
+
+echo
+echo "Shellcode size: $size"
+
+echo
+echo $opcodes
 
 echo
 echo "--------------------"

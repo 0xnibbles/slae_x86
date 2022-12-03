@@ -46,13 +46,13 @@ bitFlip:
 
 restore_next_byte:
 
-	mov byte [esi + edx], bl
+	mov byte [esi + edx], bl	; replaces the original byte
 	mov bl, byte [esi + eax + 1] ; mov next shellbyte
 	mov byte [edi], bl
 	inc edi
 	add al, 2
 	inc dl
-	inc  = 0x2b  F - 00101011
+	inc cl ; = 0x2b  F - 00101011
 
 	; Doing circular array as modulo workaround. Use 0x08 as a divisor or circular boundary because we are rotating 8 bits (al register). 
 
