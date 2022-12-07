@@ -4,9 +4,10 @@ global _start
 section .text
 _start:
 
-xor eax, eax
-push byte 1
-pop ebx
-xchg eax, ebx
+xor ebx, ebx
+mul ebx
+inc eax
 syscall
+
+; 7 bytes size
 

@@ -21,7 +21,7 @@ decoder:
 
 decode:
 	mov bl, byte [esi + eax]
-	xor bl, 0xaa
+	xor bl, 0xa0		; key used in flipRot encoding
 	jnz short Shellcode	; reached the marker if Zero Flag not set
 	mov bl, byte [esi + eax + 1]
 	mov byte [edi], bl
