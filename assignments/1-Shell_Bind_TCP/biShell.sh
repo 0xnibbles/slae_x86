@@ -24,10 +24,10 @@ final_shellcode+="$shellcode1"
 final_shellcode+="$le_port"
 final_shellcode+="$shellcode2"
 
-#echo "$shellcode1"
+#echo '"$shellcode1"
 #echo $shellcode1$le_port$shellcode2
 
-printf "\nEnjoy this Bind TCP Shellcode with the port %s\n\n%s\n" $1 $final_shellcode
+printf "\nEnjoy this Bind TCP Shellcode with the port %s\n\n\"%s\"\n" $1 $final_shellcode
 echo
 echo $port
 
