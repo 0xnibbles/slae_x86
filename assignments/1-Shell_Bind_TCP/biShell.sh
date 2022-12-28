@@ -29,7 +29,7 @@ final_shellcode+="$shellcode2"
 
 printf "\nEnjoy this Bind TCP Shellcode with the port %s\n\n\"%s\"\n" $1 $final_shellcode
 echo
-echo $port
+echo '[*] Port converted in hex Little-Endian: '$port
 
 echo
 echo "--------------------"
