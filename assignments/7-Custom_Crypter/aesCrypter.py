@@ -79,6 +79,7 @@ class Crypter:
         # print encrypted shellcode in c-style format
         print()
         print(final_shellcode)
+        return final_shellcode
 
 
     def decrypt(self, final_shellcode):
@@ -143,11 +144,6 @@ def main():
     crypter.encrypt(shellcode)
     original_shellcode = crypter.decrypt(encrypted_shellcode)
     executeShellcode(original_shellcode)
-
-
-
-
-
 
 
 

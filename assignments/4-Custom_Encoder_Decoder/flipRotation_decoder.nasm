@@ -1,8 +1,7 @@
-;Author: Eduardo
-;Filename: insertion_decoder.asm
-;A NOT encoded program which shellcode is decode in memory by using two's complement  the xor operation instead of using the length of the shellcode to be decoded.
-;Generally the marker is the xor key
-;
+; Student ID   : PA-31319
+; Student Name : Eduardo Silva
+; Assignment 4 : Custom Encoder/Decoder Shellcode (Linux/x86) Assembly - FlipRotation Encoder
+; File Name    : egg_hunter.nasm
 
 global _start
 
@@ -15,10 +14,10 @@ decoder:
 
 	pop esi
 	lea edi, [esi+1]	; pointing to second byte (0x02) from shellcode
-	xor eax, eax
+	xor eax, eax		; keep track parity byte
 	cdq					; zeroes edx
 	mov al,	1 
-	xor ecx, ecx
+	xor ecx, ecx		; loop index and number of rotation bits
 	xor ebx, ebx
 	
 
@@ -27,7 +26,7 @@ decode:
 	xor bl, 0xa0				; check if reached the end marker | 0xa0 ^ 0xff = 0x5f
 	jz short EncodedShellcode	; reached the marker if Zero Flag not set
 
-	xor bl, 0x5f	; if equal parity is even (0xff)
+	xor bl, 0x5f				; if equal, parity is even (0xff) and sets ZF
 	mov bl, byte [esi + edx] 
 	jnz odd
 
@@ -46,19 +45,19 @@ bitFlip:
 
 restore_next_byte:
 
-	mov byte [esi + edx], bl	; replaces the original byte
-	mov bl, byte [esi + eax + 1] ; mov next shellbyte
-	mov byte [edi], bl
-	inc edi
-	add al, 2
-	inc dl
-	inc cl ; = 0x2b  F - 00101011
+	mov byte [esi + edx], bl		; replaces the original byte
+	mov bl, byte [esi + eax + 1] 	; mov next encoded byte
+	mov byte [edi], bl				; change last used parity byte for the next encoded byte
+	inc edi							; edi points to position of the next parity
+	add al, 2						; offset added to next parity byte
+	inc dl							; offset to the next encoded byte
+	inc cl 							; loop index value incremented
 
 	; Doing circular array as modulo workaround. Use 0x08 as a divisor or circular boundary because we are rotating 8 bits (al register). 
 
 	cmp cl, 0x08	; if equal ZF will be set meaning we have a complete rotation
-	jnz decode	; $+2 ; jump if rotation is not complete
-	xor ecx, ecx	; if rotation is complete and reset cl to start again the "circular array"
+	jnz decode		; jump if rotation is not complete
+	xor ecx, ecx	; if rotation is complete, reset cl to start again the "circular array"
 
 	jmp short decode
 
